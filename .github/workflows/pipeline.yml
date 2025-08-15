@@ -52,7 +52,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN}}
         run: |
-          if [ -d Master/ ]; then
+          if [ -d Master ]; then
             cd Master/
             python main.py --job register
           else
