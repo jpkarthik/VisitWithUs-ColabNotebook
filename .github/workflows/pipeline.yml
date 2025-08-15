@@ -1,0 +1,63 @@
+name: VISIT WITH US TOURISM PREDICTION PIPELINE
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  data_registration:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install jupyter nbconvert huggingface_hub pandas
+
+    - name: SET UP FOLDER STRUCTURE
+      run: |
+        mkdir -p VisitWithUs-Tourism_version_1_1/Master/Data
+        mkdir -p VisitWithUs-Tourism_version_1_1/Master/Model_Dump_JOBLIB
+        if [ -f "tourism.csv"]; then
+          cp tourism.csv VisitWithUs-Tourism_version_1_1/Master/Data/tourism.csv
+        else
+          echo "Error: tourism.csv not found"
+          exit 1
+        fi
+
+    - name: CONVERT NOTEBOOK TO PYTHON SCRIPT
+      run: |
+        jupyter nbconvert --to python Visit-With-Us-Tourism-Prediction_v1_1.ipynb --output pipeline_script
+
+    - name: RUN PIPELINE SCRIPT FOR DATA REGISTRATION
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        echo "import logging" > run_data_registration.py
+        echo "logging.basicConfig(level=logging.INFO, format='%(asctime)s -%(levelname)s -%(message)s' , filename ='data_registration.log')" >> run_data_registration.py
+        echo "logging.info('Starting DataRegistation')" >> run_data_registration.py
+        echo "from DataRegistation import DataRegistration" >> run_data_registration.py
+        echo "base_path = 'VisitWithUs-Tourism_version_1_1/Master/'" >> run_data_registration.py
+        echo "dr = DataRegistration(base_path=base_path,hf_token='$HF_TOKEN')" >> run_data_registration.py
+        echo "dr.ToRunPipeline()" >> run_data_registration.py
+        echo "logging.info('DataRegistration failed')" >> run_data_registration.py
+        echo "exit 1" >> run_data_registration.py
+        python run_data_registration.py
+
+    - name: Upload logs and script
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: data-registration-outputs
+        path: |
+          data_registration.log
+          run_data_registration.py
