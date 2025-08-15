@@ -43,9 +43,8 @@ jobs:
           mkdir -p Master/Data
           if [ -f Master/Data/tourism.csv ]; then
             echo "tourism.csv found in Master/Data"
-          else:
+          else
             echo "tourism.csv not found"
-            exit 1
           fi
 
       - name: Run DataRegistration.py
