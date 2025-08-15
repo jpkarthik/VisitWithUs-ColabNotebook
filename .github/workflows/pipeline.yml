@@ -53,7 +53,7 @@ jobs:
         echo "dr = DataRegistration(base_path=base_path,hf_token='$HF_TOKEN')" >> run_data_registration.py
         echo "dr.ToRunPipeline()" >> run_data_registration.py
         echo "logging.info('DataRegistration failed')" >> run_data_registration.py
-        echo "exit 1" >> run_data_registration.py
+        echo "exit(1)" >> run_data_registration.py
         python run_data_registration.py
 
     - name: Upload logs and script
