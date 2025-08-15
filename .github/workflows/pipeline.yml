@@ -2,9 +2,16 @@ name: VISIT WITH US TOURISM PREDICTION PIPELINE
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    - main
+  paths:
+    - 'Master/Deployment/**'
+    - 'Master/Data/tourism.csv'
+    - 'Master/main.py'
+    - 'Master/DataRegistration.py'
+    - 'Master/DataPrepration.py'
+    - 'Master/ModelBuilding.py'
+    - 'Master/HostingInHuggingFace.py'
+    - '.github/workflows/pipeline.yaml'
 
 jobs:
   data_registration:
@@ -17,63 +24,48 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.12'
-
+    
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install jupyter nbconvert huggingface_hub pandas
-
-    - name: SET UP FOLDER STRUCTURE
+        pip install huggingface_hub python-dotenv pandas
+    
+    - name: List Direcory contents(debug)
       run: |
-        mkdir -p Master/Data
-        mkdir -p Master/Model_Dump_JOBLIB
-        echo "Listing files in Repository"
-        ls -R
-        if test -f Master/Data/tourism.csv; 
-        then
-          echo "tourism.csv already exists"
-        else
-          echo "Error: tourism.csv not found in Master/Data/"
-          exit 1
-        fi
-
-        if test -f Master/Visit-With-Us-Tourism-Prediction_v1_1.ipynb;then
-          echo "ipynb solution file exists"
-        else
-          echo "ipynb file not found in Master Folder" >> data_registration.log
-          exit 1
-        fi
-
-    - name: CONVERT NOTEBOOK TO PYTHON SCRIPT
-      run: |
-        jupyter nbconvert --to python Master/Visit-With-Us-Tourism-Prediction_v1_1.ipynb --output pipeline_script
-        if test -f pipeline_scriptpy; then
-          echo "Python script generated successfully"
-        else
-          echo "Error: Python script not generated"
-          exit 1
-        fi
-
-    - name: RUN PIPELINE SCRIPT FOR DATA REGISTRATION
+        ls -la Master/Data/ || echo "Master/Data/ Directory not found"
+        ls -la . || echo "Root Directory Contents"
+    
+    - name: Copy Dataset File
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        echo "import logging" > run_data_registration.py
-        echo "logging.basicConfig(level=logging.INFO, format='%(asctime)s -%(levelname)s -%(message)s' , filename ='data_registration.log')" >> run_data_registration.py
-        echo "logging.info('Starting DataRegistation')" >> run_data_registration.py
-        echo "from pipeline_script import DataRegistration" >> run_data_registration.py
-        echo "base_path = 'Master/'" >> run_data_registration.py
-        echo "dr = DataRegistration(base_path=base_path,hf_token='$HF_TOKEN')" >> run_data_registration.py
-        echo "dr.ToRunPipeline()" >> run_data_registration.py
-        echo "logging.info('DataRegistration failed')" >> run_data_registration.py
-        echo "exit(1)" >> run_data_registration.py
-        python run_data_registration.py
+        mkdir -p Master/Data
+        if [ -f Master/Data/tourism.csv ]; then
+          echo "tourism.csv found in Master/Data"
+        else:
+          echo "tourism.csv not found'
+          exit 1
+        fi
+    
+    - name: Run DataRegistration.py
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN}}
+      run: |
+        cd Master
+        python main.py --job register
+    
+    - name: Check Pipeline Status
+      if: failure()
+      run: |
+        echo "DataRegistration pipeline failed. please check logs"
+        exit 1
 
-    - name: Upload logs and script
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: data-registration-outputs
-        path: |
-          data_registration.log
-          run_data_registration.py
+    - name: Verify Upload
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        echo "Verifying Upload on Hugging Face"
+        python -c "import os; from huggingface_hub import HfApi; api=HfApi(token=os.getenv('HF_TOKEN'));print(api.repo_info(repo_id='jpkarthikeyan/Tourism-Visit-With-us-dataset',repo_type='dataset))"
+
+        
+
