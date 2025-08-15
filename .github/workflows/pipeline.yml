@@ -33,8 +33,9 @@ jobs:
 
       - name: List Direcory contents(debug)
         run: |
-          ls -la Master/Data/ || echo "Master/Data/ Directory not found"
           ls -la . || echo "Root Directory Contents"
+          ls -la Master/Data/ || echo "Master/Data/ Directory not found"
+          ls -la Master/ || echo "Master Directory"
 
       - name: Copy Dataset File
         env:
@@ -51,9 +52,14 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN}}
         run: |
-          cd Master/
-          ls -la Master/ || echo "Master Directory"
-          python main.py --job register
+          if [ -d Master ]; then
+            cd Master
+            python main.py --job register
+          else
+            echo "Master Directory not found"
+            exit 1
+          fi
+          
 
       - name: Check Pipeline Status
         if: failure()
