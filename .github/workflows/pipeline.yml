@@ -48,7 +48,7 @@ jobs:
         echo "import logging" > run_data_registration.py
         echo "logging.basicConfig(level=logging.INFO, format='%(asctime)s -%(levelname)s -%(message)s' , filename ='data_registration.log')" >> run_data_registration.py
         echo "logging.info('Starting DataRegistation')" >> run_data_registration.py
-        echo "from DataRegistation import DataRegistration" >> run_data_registration.py
+        echo "from pipeline_script import DataRegistration" >> run_data_registration.py
         echo "base_path = 'Master/'" >> run_data_registration.py
         echo "dr = DataRegistration(base_path=base_path,hf_token='$HF_TOKEN')" >> run_data_registration.py
         echo "dr.ToRunPipeline()" >> run_data_registration.py
