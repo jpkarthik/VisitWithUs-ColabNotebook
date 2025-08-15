@@ -27,8 +27,10 @@ jobs:
       run: |
         mkdir -p VisitWithUs-Tourism_version_1_1/Master/Data
         mkdir -p VisitWithUs-Tourism_version_1_1/Master/Model_Dump_JOBLIB
-        if [ -f "tourism.csv"]; then
-          cp tourism.csv VisitWithUs-Tourism_version_1_1/Master/Data/tourism.csv
+        echo "Listing files in Repository"
+        ls -R
+        if test -f VisitWithUs-Tourism_version_1_1/Master/Data/tourism.csv; then
+          echo "tourism.csv already exists"
         else
           echo "Error: tourism.csv not found"
           exit 1
