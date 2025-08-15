@@ -37,9 +37,22 @@ jobs:
           exit 1
         fi
 
+        if test -f Master/Visit-With-Us-Tourism-Prediction_v1_1.ipynb;then
+          echo "ipynb solution file exists"
+        else
+          echo "ipynb file not found in Master Folder" >> data_registration.log
+          exit 1
+        fi
+
     - name: CONVERT NOTEBOOK TO PYTHON SCRIPT
       run: |
         jupyter nbconvert --to python Master/Visit-With-Us-Tourism-Prediction_v1_1.ipynb --output pipeline_script
+        if test -f pipeline_scriptpy; then
+          echo "Python script generated successfully"
+        else
+          echo "Error: Python script not generated"
+          exit 1
+        fi
 
     - name: RUN PIPELINE SCRIPT FOR DATA REGISTRATION
       env:
