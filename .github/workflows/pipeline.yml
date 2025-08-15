@@ -18,55 +18,52 @@ jobs:
   data_registration:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
     
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install huggingface_hub python-dotenv pandas
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install huggingface_hub python-dotenv pandas
     
-    - name: List Direcory contents(debug)
-      run: |
-        ls -la Master/Data/ || echo "Master/Data/ Directory not found"
-        ls -la . || echo "Root Directory Contents"
+      - name: List Direcory contents(debug)
+        run: |
+          ls -la Master/Data/ || echo "Master/Data/ Directory not found"
+          ls -la . || echo "Root Directory Contents"
     
-    - name: Copy Dataset File
-      env:
-        HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      run: |
-        mkdir -p Master/Data
-        if [ -f Master/Data/tourism.csv ]; then
-          echo "tourism.csv found in Master/Data"
-        else:
-          echo "tourism.csv not found'
+      - name: Copy Dataset File
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          mkdir -p Master/Data
+          if [ -f Master/Data/tourism.csv ]; then
+            echo "tourism.csv found in Master/Data"
+          else:
+            echo "tourism.csv not found'
+            exit 1
+          fi
+    
+      - name: Run DataRegistration.py
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN}}
+        run: |
+          cd Master
+          python main.py --job register
+    
+      - name: Check Pipeline Status
+        if: failure()
+        run: |
+          echo "DataRegistration pipeline failed. please check logs"
           exit 1
-        fi
-    
-    - name: Run DataRegistration.py
-      env:
-        HF_TOKEN: ${{ secrets.HF_TOKEN}}
-      run: |
-        cd Master
-        python main.py --job register
-    
-    - name: Check Pipeline Status
-      if: failure()
-      run: |
-        echo "DataRegistration pipeline failed. please check logs"
-        exit 1
 
-    - name: Verify Upload
-      env:
-        HF_TOKEN: ${{ secrets.HF_TOKEN }}
-      run: |
-        echo "Verifying Upload on Hugging Face"
-        python -c "import os; from huggingface_hub import HfApi; api=HfApi(token=os.getenv('HF_TOKEN'));print(api.repo_info(repo_id='jpkarthikeyan/Tourism-Visit-With-us-dataset',repo_type='dataset))"
-
-
-
+      - name: Verify Upload
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Verifying Upload on Hugging Face"
+          python -c "import os; from huggingface_hub import HfApi; api=HfApi(token=os.getenv('HF_TOKEN'));print(api.repo_info(repo_id='jpkarthikeyan/Tourism-Visit-With-us-dataset',repo_type='dataset))"
