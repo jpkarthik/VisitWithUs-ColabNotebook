@@ -25,20 +25,21 @@ jobs:
 
     - name: SET UP FOLDER STRUCTURE
       run: |
-        mkdir -p VisitWithUs-Tourism_version_1_1/Master/Data
-        mkdir -p VisitWithUs-Tourism_version_1_1/Master/Model_Dump_JOBLIB
+        mkdir -p Master/Data
+        mkdir -p Master/Model_Dump_JOBLIB
         echo "Listing files in Repository"
         ls -R
-        if test -f VisitWithUs-Tourism_version_1_1/Master/Data/tourism.csv; then
+        if test -f Master/Data/tourism.csv; 
+        then
           echo "tourism.csv already exists"
         else
-          echo "Error: tourism.csv not found"
+          echo "Error: tourism.csv not found in Master/Data/"
           exit 1
         fi
 
     - name: CONVERT NOTEBOOK TO PYTHON SCRIPT
       run: |
-        jupyter nbconvert --to python Visit-With-Us-Tourism-Prediction_v1_1.ipynb --output pipeline_script
+        jupyter nbconvert --to python Master/Visit-With-Us-Tourism-Prediction_v1_1.ipynb --output pipeline_script
 
     - name: RUN PIPELINE SCRIPT FOR DATA REGISTRATION
       env:
@@ -48,7 +49,7 @@ jobs:
         echo "logging.basicConfig(level=logging.INFO, format='%(asctime)s -%(levelname)s -%(message)s' , filename ='data_registration.log')" >> run_data_registration.py
         echo "logging.info('Starting DataRegistation')" >> run_data_registration.py
         echo "from DataRegistation import DataRegistration" >> run_data_registration.py
-        echo "base_path = 'VisitWithUs-Tourism_version_1_1/Master/'" >> run_data_registration.py
+        echo "base_path = 'Master/'" >> run_data_registration.py
         echo "dr = DataRegistration(base_path=base_path,hf_token='$HF_TOKEN')" >> run_data_registration.py
         echo "dr.ToRunPipeline()" >> run_data_registration.py
         echo "logging.info('DataRegistration failed')" >> run_data_registration.py
