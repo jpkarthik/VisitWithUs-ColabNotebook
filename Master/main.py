@@ -4,56 +4,19 @@ import argparse
 import logging
 import traceback
 from huggingface_hub import HfApi
+from dotenv import load_dotenv
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename='pipeline.log')
-base_path = ""
-hf_token = ""
+base_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','Master'))
+hf_token = os.getenv('HF_TOKEN')
 
-try:
-  if 'google.colab' in sys.modules or 'COLAB_GPU' in os.environ:
-    try:
-      from google.colab import drive
-      #drive.mount('/content/drive/')
-      base_path = '/content/drive/MyDrive/PGP_AI_ML_GREAT_LEARNING/10_Advance_Machine_Learning_And_MLOps/Final_Project/VisitWithUs-Tourism_version_1_1/Master/'
-    except Exception as ex:
-      logging.error(f"Drive Mount exception: {ex}")
-      traceback.print_exc
-      raise
-    
-    try:
-      from google.colab import userdata
-      hf_token = userdata.get('HF_TOKEN')
-      print(hf_token)
-    except Exception as ex:
-      logging.error(f"HF_TOKEN NOT FOUND: {ex}")
-      traceback.print_exc
-      raise
+logging.info(f"Base Path {base_path}")
+sys.path.append(base_path)
 
-  else:
-    try:
-      base_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'..','Master'))
-    except Exception as ex:
-      logging.error(f"Exception in getting base_path {base_path}")
-      traceback.print_exc
-    
-    try:
-      hf_token = os.getenv('HF_TOKEN')
-    except Exception as ex:
-      logging.error(f"Exception in getting HF_TOKEN {ex}")
-      traceback.print_exc
-
-  print(f"Base_path {base_path}")
-  logging.info(f"Base Path: {base_path}")
-  sys.path.append(base_path)
-
-except Exception as ex:
-  print(f"Exception occured in getting the base path and hf token: {ex}")
-  traceback.print_exc()
-  logging.error(f"Exception occured in getting the base path and hf token: {ex}")
-  logging.error(traceback.print_exc())
+if not hf_token:
+  logging.error("HF_TOKEN not found")
   sys.exit(1)
-
 
 api = HfApi(token = hf_token)
 try:
@@ -105,7 +68,7 @@ if args.job == 'modelbuilding':
     sys.exit(1)
   else:
     logging.info("Model Building Completed")
-  
+
 
 
 
