@@ -44,7 +44,7 @@ jobs:
           if [ -f Master/Data/tourism.csv ]; then
             echo "tourism.csv found in Master/Data"
           else
-            echo "tourism.csv not found"
+            echo "tourism.csv not found in Master/Data/"
           fi
 
       - name: Run DataRegistration.py
