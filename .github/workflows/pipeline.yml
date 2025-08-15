@@ -1,17 +1,18 @@
 name: VISIT WITH US TOURISM PREDICTION PIPELINE
-
 on:
   push:
-    - main
-  paths:
-    - 'Master/Deployment/**'
-    - 'Master/Data/tourism.csv'
-    - 'Master/main.py'
-    - 'Master/DataRegistration.py'
-    - 'Master/DataPrepration.py'
-    - 'Master/ModelBuilding.py'
-    - 'Master/HostingInHuggingFace.py'
-    - '.github/workflows/pipeline.yaml'
+    branches:
+      - main
+    paths:
+      - 'Master/Deployment/**'
+      - 'Master/Data/tourism.csv'
+      - 'Master/main.py'
+      - 'Master/DataRegistration.py'
+      - 'Master/DataPrepration.py'
+      - 'Master/ModelBuilding.py'
+      - 'Master/HostingInHuggingFace.py'
+      - '.github/workflows/pipeline.yaml'
+  workflow_dispatch:
 
 jobs:
   data_registration:
@@ -67,5 +68,5 @@ jobs:
         echo "Verifying Upload on Hugging Face"
         python -c "import os; from huggingface_hub import HfApi; api=HfApi(token=os.getenv('HF_TOKEN'));print(api.repo_info(repo_id='jpkarthikeyan/Tourism-Visit-With-us-dataset',repo_type='dataset))"
 
-        
+
 
