@@ -1,0 +1,6 @@
+# Ignore sensitive files
+*.log
+*.pyc
+__pycache__/
+.env
+.git/config
