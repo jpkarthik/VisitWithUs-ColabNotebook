@@ -145,7 +145,7 @@ jobs:
         if: failure()
         run: |
           echo "Exception in Build Models. please check logs"
-          exist 1
+          exit 1
 
       - name: Verify Execution
         env:
