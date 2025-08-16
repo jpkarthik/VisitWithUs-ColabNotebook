@@ -183,6 +183,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+      actions: read
     needs: model-building
     steps:
       - name: Checkout Repository
@@ -207,17 +208,23 @@ jobs:
         run: |
           echo "Acor: $GITHUB_ACTOR"
           echo "GITHUB_TOKEN is set: ${GITHUB_TOKEN:0:2}..."
+          if [ -z "$GITHUB_TOKEN" ]; then 
+            echo "GITHUB_TOKEN is empty";
+          else 
+            echo "GITHUB_TOKEN length: ${#GITHUB_TOKEN}";
+          fi
 
       - name: Login to GITHUB CONTAINER REGISTRY
         env:
-          HF_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo $HF_TOKEN | docker login -u ${GITHUB_ACTOR} --password-stdin ghcr.io
+          echo "Login to GITHUB Container Reistry"
+          echo $GITHUB_TOKEN | docker login -u ${GITHUB_ACTOR} --password-stdin ghcr.io
           echo "Docker Login succss"
 
       - name: Build and Push Docker image to GITHUB Container REGISTRY
         env:
-          HF_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd Master/Deployment
           docker build -t jpkarthik/tourism-prediction-app:latest .
