@@ -12,6 +12,9 @@ class DataPrepration:
     self.repoID = 'jpkarthikeyan/Tourism-visit-with-us-dataset'
     self.Subfolders = os.path.join(base_path, 'Data')
     self.hf_token = hf_token
+    print(f'self.repoID: {self.repoID}')
+    print(f'self.Subfolders: {self.Subfolders}')
+    print('-'*50)
 
   def LoadDatasetFromHF(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
@@ -135,7 +138,7 @@ class DataPrepration:
             result_train = self.UploadIntoHF(df_train_cleaned,
                                              self.Subfolders,'train.csv')
             result_test = self.UploadIntoHF(df_test_cleaned,
-                                            self.subfolders,'test.csv')
+                                            self.Subfolders,'test.csv')
             if not result_train or not result_test:
               print('Splitted dataset upload into HF Exception')
               return False

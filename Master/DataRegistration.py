@@ -16,6 +16,7 @@ class DataRegistration:
     print(f"self.Subfolders: {self.Subfolders}")
     print(f"self.folder_Master: {self.folder_Master}")
     print(f"folder_data: {self.folder_data}")
+    print('-'*50)
 
   def HFCreateRepo(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
@@ -70,9 +71,11 @@ class DataRegistration:
       print('Exception in data registration HFCreateRepo')
       return False
     else:
+      print('-'*50)
       if not self.UploadingSourceData():
         print('Exception in data registration UploadingSourceData')
         return False
       else:
         print('Data Registration Completed')
+        print('-'*50)
         return True

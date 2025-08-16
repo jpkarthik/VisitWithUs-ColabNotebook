@@ -263,6 +263,10 @@ class BuildingModels:
         plt.title(f'{mdl_name} confusion matrix')
         plt.tight_layout()
         plt.show()
+        plot_path = os.path.join(self.base_path,'Model_Dump_JOBLIB',f'{mdl_name}_ConfusionMatrix.png')
+        plt.savefig(plot_path)
+        plt.close()
+        
 
         df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
                                             'precision':[precision], 'recall':[recall],
@@ -311,7 +315,7 @@ class BuildingModels:
 
 
       print("Uploading the best threshold text file to HF")
-      with open('Master/Model_Dump_JOBLIB/best_threshold.txt','w') as f:
+      with open(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt','w') as f:
         f.write(str(self.best_model_threshold))
       api.upload_file(path_or_fileobj = f"{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt",
                       path_in_repo = f"Model_Dump_JOBLIB/best_threshold.txt",
