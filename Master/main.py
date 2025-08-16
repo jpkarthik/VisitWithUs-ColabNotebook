@@ -3,16 +3,15 @@ import sys
 import argparse
 from dotenv import load_dotenv
 
-load_dotenv()
-
-base_path = os.path.abspath((os.path.dirname(__file__)))
+try:
+  base_path = os.path.abspath((os.path.dirname(__file__)))
+except:
+  base_path = os.path.join(os.getcwd(),'Master')
+  print(base_path)
 
 print(f'Base path {base_path}')
 
 sys.path.append(base_path)
-
-
-
 
 data_dir = os.path.join(base_path, 'Data')
 model_dir = os.path.join(base_path,'Model_Dump_JOBLIB')
@@ -27,7 +26,7 @@ args = parser.parse_args()
 
 os.makedirs(data_dir, exist_ok=True)
 os.makedirs(model_dir, exist_ok=True)
-
+load_dotenv(dotenv_path=os.path.join(base_path,'.env'))
 hf_token = os.getenv('HF_TOKEN')
 if not hf_token:
   raise ValueError("HF_TOKEN not found in .env file")

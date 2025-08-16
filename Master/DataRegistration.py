@@ -11,7 +11,7 @@ class DataRegistration:
     self.folder_Master = base_path
     self.folder_data = os.path.join(base_path,"Data")
     self.hf_token = hf_token
-    
+
     os.makedirs(self.folder_data, exist_ok=True)
     print(f"self.Subfolders: {self.Subfolders}")
     print(f"self.folder_Master: {self.folder_Master}")

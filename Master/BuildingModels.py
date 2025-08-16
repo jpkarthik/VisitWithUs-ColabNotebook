@@ -266,7 +266,7 @@ class BuildingModels:
         plot_path = os.path.join(self.base_path,'Model_Dump_JOBLIB',f'{mdl_name}_ConfusionMatrix.png')
         plt.savefig(plot_path)
         plt.close()
-        
+
 
         df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
                                             'precision':[precision], 'recall':[recall],

@@ -12,15 +12,6 @@ logger = logging.getLogger(__name__)
 cache_dir = "/tmp/hf_cache"
 os.environ["HF_HOME"] = cache_dir
 os.environ["HUGGINGFACE_HUB_CACHE"] = cache_dir
-# base_path = os.getcwd()
-# logger.info(f"Base Path: {base_path}")
-# streamlit_config_dir = os.path.join(base_path,'.streamlit')
-# os.makedirs(streamlit_config_dir,exist_ok=True)
-# logger.info(f'streamlit_config_dir: {streamlit_config_dir}')
-# os.environ['STREAMLIT_CONFIG_DIR'] = streamlit_config_dir
-
-# os.makedirs('/content/.streamlit', exist_ok=True)
-# os.environ['STREAMLIT_CONFIG_DIR'] = '/content/.streamlit'
 
 try:
   hf_token = os.getenv("HUGGINGFACE_TOKEN")
