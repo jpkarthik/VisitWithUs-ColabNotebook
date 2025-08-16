@@ -205,7 +205,7 @@ jobs:
       - name: Debug Authentication
         run: |
           echo "Actor: $GITHUB_ACTOR"
-          echo "PAT_TOKEN is set: ${PAT_TOKEN:0:2}..."
+          echo "PAT_TOKEN is set: ${PAT_TOKEN:+[SET_${#PAT_TOKEN}_chars]}"
           if [ -z "$PAT_TOKEN" ]; then 
             echo "PAT_TOKEN is empty";
           else 
