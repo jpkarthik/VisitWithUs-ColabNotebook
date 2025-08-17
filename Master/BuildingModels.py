@@ -339,11 +339,10 @@ class BuildingModels:
                       repo_id=self.repo_id, repo_type=self.repo_type
                       )
       with mlflow.start_run(run_name=f"Best_{self.best_model_name}"):
-        mlflow.log_param(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib')
-
-        mlflow.log_param(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt')
-
-        mlflow.sklearn.log_model(best_model,f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib')
+        
+        mlflow.log_metric('best_f1_score',self.best_f1_score)
+        mlflow.log_metric('best_threshold',self.best_model_threshold)
+        
 
         
 
