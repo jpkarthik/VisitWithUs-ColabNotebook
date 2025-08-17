@@ -3,6 +3,9 @@ import os
 import joblib
 import inspect
 import traceback
+import mlflow
+import mlflow.sklearn
+import mlflow.xgboost
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -46,6 +49,8 @@ class BuildingModels:
     self.ds_repo_id = 'jpkarthikeyan/Tourism-visit-with-us-dataset'
     self.repo_type = 'model'
     self.hf_token = hf_token
+    mlflow.set_tracking_uri("file://"+os.path.join(base_path,"mlruns"))
+    mlflow.set_experiment("Tourism-Prediction-Experiment")
     self.categorical_columns = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
     self.numerical_columns = ['Age','CityTier','DurationOfPitch','NumberOfPersonVisiting',
                               'NumberOfFollowups','PreferredPropertyStar',
@@ -189,27 +194,32 @@ class BuildingModels:
 
       for model_name, mdl_params in models_params.items():
         print(f'Model {model_name} started')
-        pipeline = Pipeline(steps=[
-            ('preprocessor',preprocessor),
-            ('classifier',mdl_params['model'])
-        ])
-        random_search = RandomizedSearchCV(pipeline,mdl_params['params'],
-                                           n_iter=50,cv=cv_KFold,scoring='f1',
-                                           random_state=42,n_jobs=-1,verbose=2)
+        with mlflow.start_run(run_name=model_name):
+          pipeline = Pipeline(steps=[
+              ('preprocessor',preprocessor),
+              ('classifier',mdl_params['model'])
+              ])
+          random_search = RandomizedSearchCV(pipeline,mdl_params['params'],
+                                            n_iter=50,cv=cv_KFold,scoring='f1',
+                                            random_state=42,n_jobs=-1,verbose=2)
 
-        random_search.fit(self.feature_train,self.target_train)
+          random_search.fit(self.feature_train,self.target_train)
 
-        self.models[model_name] = {
-            'model':random_search.best_estimator_,
-            'best_score': random_search.best_score_,
-            'best_params':random_search.best_params_
-        }
-        joblib.dump(random_search.best_estimator_,f'{self.base_path}/Model_Dump_JOBLIB/{model_name}.joblib')
-        print(f'model:{random_search.best_estimator_}')
-        print(f'best_score: {random_search.best_score_}')
-        print(f'best_params: {random_search.best_params_}')
-        print(f'Modle {model_name} completed')
-        print('-'*50)
+          self.models[model_name] = {
+              'model':random_search.best_estimator_,
+              'best_score': random_search.best_score_,
+              'best_params':random_search.best_params_
+            }
+          joblib.dump(random_search.best_estimator_,f'{self.base_path}/Model_Dump_JOBLIB/{model_name}.joblib')
+
+          mlflow.log_params(random_search.best_params_)
+          mlflow.log_metric('best_score',random_search.best_score_)
+          mlflow.log_artifact(f"{self.base_path}/Model_Dump_JOBLIB/{model_name}.joblib")
+          print(f'model:{random_search.best_estimator_}')
+          print(f'best_score: {random_search.best_score_}')
+          print(f'best_params: {random_search.best_params_}')
+          print(f'Modle {model_name} completed')
+          print('-'*50)
 
       return self.models
     except Exception as ex:
@@ -222,60 +232,67 @@ class BuildingModels:
     df_metrics = pd.DataFrame()
     try:
       for mdl_name, mdl_info in self.models.items():
-        model = mdl_info['model']
-        predict_proability = model.predict_proba(self.feature_test)
-        print(f"Predict proability shape {mdl_name} {predict_proability.shape}")
-        if predict_proability.shape[1] ==1:
-          predict_proability = predict_proability.flatten()
-        else:
-          predict_proability = predict_proability[:,1]
+        with mlflow.start_run(run_name=f"{mdl_name}_eval"):
+          model = mdl_info['model']
+          predict_proability = model.predict_proba(self.feature_test)
+          print(f"Predict proability shape {mdl_name} {predict_proability.shape}")
+          if predict_proability.shape[1] ==1:
+            predict_proability = predict_proability.flatten()
+          else:
+            predict_proability = predict_proability[:,1]
+
+          prc_precision,prc_recall, prc_threshold = precision_recall_curve(self.target_test,predict_proability)
+          prc_f1score = 2*((prc_precision*prc_recall) / (prc_precision+prc_recall+1e-10))
+
+          prc_threshold_idmx = np.argmax(prc_f1score)
+          prc_best_threshold = prc_threshold[prc_threshold_idmx]
+          print(f'best threshold: {prc_best_threshold}')
+
+          predic_prob_threshold = (predict_proability >= prc_best_threshold).astype(int)
+          #predic_prob_threshold = (predict_proability >= 0.5).astype(int)
+          accuracy = accuracy_score(self.target_test,predic_prob_threshold)
+          precision = precision_score(self.target_test,predic_prob_threshold)
+          recall = recall_score(self.target_test,predic_prob_threshold)
+          f1score = f1_score(self.target_test,predic_prob_threshold)
+          class_report = classification_report(self.target_test,predic_prob_threshold)
+          conf_matrix = confusion_matrix(self.target_test,predic_prob_threshold)
+
+          lbl = ['TN', 'FP', 'FN', 'TP']
+          cnf_lbl = ['\n{0:0.0f}'.format(cnf_val) for cnf_val in conf_matrix.flatten()]
+          cn_percentage = ["\n{0:.2%}".format(item/conf_matrix.flatten().sum()) for item in conf_matrix.flatten()]
+
+          confusion_label = np.asarray([["\n {0:0.0f}".format(item)+"\n{0:.2%}".format(item/conf_matrix.flatten().sum())]
+                                  for item in conf_matrix.flatten()]).reshape(2,2)
+
+          cnf_label = np.asarray([f'{lbl1} {lbl2} {lbl3}' for lbl1, lbl2, lbl3 in zip(lbl, cnf_lbl,  cn_percentage)]).reshape(2,2)
+
+          plt.figure(figsize = (3,3))
+          sns.heatmap(conf_matrix, annot = cnf_label, cmap = 'Spectral', fmt='' )
+          plt.xlabel('Predicted')
+          plt.ylabel('Actual')
+          plt.title(f'{mdl_name} confusion matrix')
+          plt.tight_layout()
+          plt.show()
+          plot_path = os.path.join(self.base_path,'Model_Dump_JOBLIB',f'{mdl_name}_ConfusionMatrix.png')
+          plt.savefig(plot_path)
+          plt.close()
+
+          mlflow.log_metric('accuracy',accuracy)
+          mlflow.log_metric('precision',precision)
+          mlflow.log_metric('recall',recall)
+          mlflow.log_metric('f1_score',f1score)
+          mlflow.log_text(class_report,f'{mdl_name}_classification_report.txt')
+          mlflow.log_artifact(plot_path)
 
 
-        prc_precision,prc_recall, prc_threshold = precision_recall_curve(self.target_test,predict_proability)
-        prc_f1score = 2*((prc_precision*prc_recall) / (prc_precision+prc_recall+1e-10))
+          df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
+                                              'precision':[precision], 'recall':[recall],
+                                              'f1_score':[f1score]})],ignore_index=True)
 
-        prc_threshold_idmx = np.argmax(prc_f1score)
-        prc_best_threshold = prc_threshold[prc_threshold_idmx]
-        print(f'best threshold: {prc_best_threshold}')
-
-        predic_prob_threshold = (predict_proability >= prc_best_threshold).astype(int)
-        #predic_prob_threshold = (predict_proability >= 0.5).astype(int)
-        accuracy = accuracy_score(self.target_test,predic_prob_threshold)
-        precision = precision_score(self.target_test,predic_prob_threshold)
-        recall = recall_score(self.target_test,predic_prob_threshold)
-        f1score = f1_score(self.target_test,predic_prob_threshold)
-        class_report = classification_report(self.target_test,predic_prob_threshold)
-        conf_matrix = confusion_matrix(self.target_test,predic_prob_threshold)
-
-        lbl = ['TN', 'FP', 'FN', 'TP']
-        cnf_lbl = ['\n{0:0.0f}'.format(cnf_val) for cnf_val in conf_matrix.flatten()]
-        cn_percentage = ["\n{0:.2%}".format(item/conf_matrix.flatten().sum()) for item in conf_matrix.flatten()]
-
-        confusion_label = np.asarray([["\n {0:0.0f}".format(item)+"\n{0:.2%}".format(item/conf_matrix.flatten().sum())]
-                                for item in conf_matrix.flatten()]).reshape(2,2)
-
-        cnf_label = np.asarray([f'{lbl1} {lbl2} {lbl3}' for lbl1, lbl2, lbl3 in zip(lbl, cnf_lbl,  cn_percentage)]).reshape(2,2)
-
-        plt.figure(figsize = (3,3))
-        sns.heatmap(conf_matrix, annot = cnf_label, cmap = 'Spectral', fmt='' )
-        plt.xlabel('Predicted')
-        plt.ylabel('Actual')
-        plt.title(f'{mdl_name} confusion matrix')
-        plt.tight_layout()
-        plt.show()
-        plot_path = os.path.join(self.base_path,'Model_Dump_JOBLIB',f'{mdl_name}_ConfusionMatrix.png')
-        plt.savefig(plot_path)
-        plt.close()
-
-
-        df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
-                                            'precision':[precision], 'recall':[recall],
-                                            'f1_score':[f1score]})],ignore_index=True)
-
-        if f1score > self.best_f1_score:
-          self.best_f1_score = f1score
-          self.best_model_threshold = prc_best_threshold
-          self.best_model_name = mdl_name
+          if f1score > self.best_f1_score:
+            self.best_f1_score = f1score
+            self.best_model_threshold = prc_best_threshold
+            self.best_model_name = mdl_name
 
       best_model = self.models[self.best_model_name]['model']
       if hasattr(best_model, 'feature_importances_'):
@@ -321,6 +338,15 @@ class BuildingModels:
                       path_in_repo = f"Model_Dump_JOBLIB/best_threshold.txt",
                       repo_id=self.repo_id, repo_type=self.repo_type
                       )
+      with mlflow.start_run(run_name=f"Best_{self.best_model_name}"):
+        mlflow.log_param(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib')
+
+        mlflow.log_param(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt')
+
+        mlflow.sklearn.log_model(best_model,f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib')
+
+        
+
 
       return True
 
