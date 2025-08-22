@@ -163,22 +163,29 @@ jobs:
 
 
       - name: Commit and Push Generated Files
-
         run: |
           git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions@users.noreply.github.com'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add Master/Model_Dump_JOBLIB/*
           git commit -m "Adding genearated model files and confusion matrix plots" || echo "No changes to commit"
 
-      - name: Pull Remote changes
-        run: |
-          git pull origin main --rebase
+          git pull origin main --rebase || {
+             echo "Merge Conflict detectd. Aborting rebase and skipping 
+             git rebase --abort
+             exit 0
+             }
 
-      - name: Push Generated Files
-        run: |
           git pull origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Handle Rebase Failure
+        if: failure()
+        run:
+          echo "Rebase failed. cleaning up"
+          git rebase --abort || true
+          exit 0
+          
 
   deploy-to-spaces:
     runs-on: ubuntu-latest
