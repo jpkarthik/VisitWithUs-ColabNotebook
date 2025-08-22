@@ -49,7 +49,9 @@ class BuildingModels:
     self.ds_repo_id = 'jpkarthikeyan/Tourism-visit-with-us-dataset'
     self.repo_type = 'model'
     self.hf_token = hf_token
-    mlflow.set_tracking_uri("file://"+os.path.join(base_path,"mlruns"))
+    mlruns_path = os.path.join(base_path,"mlruns")
+    os.makedirs(mlruns_path, exist_ok=True)
+    mlflow.set_tracking_uri(f"file://{mlruns_path}")
     mlflow.set_experiment("Tourism-Prediction-Experiment")
     self.categorical_columns = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
     self.numerical_columns = ['Age','CityTier','DurationOfPitch','NumberOfPersonVisiting',
