@@ -339,12 +339,12 @@ class BuildingModels:
                       repo_id=self.repo_id, repo_type=self.repo_type
                       )
       with mlflow.start_run(run_name=f"Best_{self.best_model_name}"):
-        
+
         mlflow.log_metric('best_f1_score',self.best_f1_score)
         mlflow.log_metric('best_threshold',self.best_model_threshold)
-        
 
-        
+
+
 
 
       return True

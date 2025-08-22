@@ -1,0 +1,14 @@
+artifact_uri: file:///content/drive/MyDrive/PGP_AI_ML_GREAT_LEARNING/10_Advance_Machine_Learning_And_MLOps/Final_Project/VisitWithUs-Tourism_version_1_1/Master/mlruns/715588642273827185/00bc132cf6be4ce6b7279c887d458b47/artifacts
+end_time: 1755412090738
+entry_point_name: ''
+experiment_id: '715588642273827185'
+lifecycle_stage: active
+run_id: 00bc132cf6be4ce6b7279c887d458b47
+run_name: AdaBoostingClassifier
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755412085281
+status: 3
+tags: []
+user_id: root

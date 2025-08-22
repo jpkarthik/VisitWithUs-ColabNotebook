@@ -1,0 +1,14 @@
+artifact_uri: file:///content/drive/MyDrive/PGP_AI_ML_GREAT_LEARNING/10_Advance_Machine_Learning_And_MLOps/Final_Project/VisitWithUs-Tourism_version_1_1/Master/mlruns/715588642273827185/a96f40d86b664292be8aabcc8a7fdcae/artifacts
+end_time: 1755412124948
+entry_point_name: ''
+experiment_id: '715588642273827185'
+lifecycle_stage: active
+run_id: a96f40d86b664292be8aabcc8a7fdcae
+run_name: XGBoostingClassifier
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1755412115953
+status: 3
+tags: []
+user_id: root
