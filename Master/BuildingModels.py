@@ -225,7 +225,7 @@ class BuildingModels:
 
           mlflow.log_params(random_search.best_params_)
           mlflow.log_metric('best_score',random_search.best_score_)
-          mlflow.log_artifact(abs_path,rel_path)
+          #mlflow.log_artifact(abs_path,rel_path)
           print(f'model:{random_search.best_estimator_}')
           print(f'best_score: {random_search.best_score_}')
           print(f'best_params: {random_search.best_params_}')
