@@ -53,6 +53,7 @@ class BuildingModels:
     print(mlruns_path)
     os.makedirs(mlruns_path, exist_ok=True)
     mlflow.set_tracking_uri(f"file://{mlruns_path}")
+    print(f"Tracking URI file://{mlruns_path}")
     mlflow.set_experiment("Tourism-Prediction-Experiment")
     self.categorical_columns = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
     self.numerical_columns = ['Age','CityTier','DurationOfPitch','NumberOfPersonVisiting',
@@ -227,6 +228,7 @@ class BuildingModels:
       return self.models
     except Exception as ex:
       print(f"Exception: {ex}")
+      print(traceback.print_exc())
     finally:
       print('-'*50)
 
