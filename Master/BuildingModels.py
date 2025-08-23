@@ -50,7 +50,7 @@ class BuildingModels:
     self.repo_type = 'model'
     self.hf_token = hf_token
     mlruns_path = os.path.join(base_path,"mlruns")
-    print(mlruns_path)
+    print(f"ML Run path: {mlruns_path}")
     os.makedirs(mlruns_path, exist_ok=True)
     mlflow.set_tracking_uri(f"file://{mlruns_path}")
     print(f"Tracking URI file://{mlruns_path}")
@@ -214,11 +214,16 @@ class BuildingModels:
               'best_score': random_search.best_score_,
               'best_params':random_search.best_params_
             }
+          
+          model_dir = os.path.join(self.base_path,'Model_Dump_JOBLIB')
+          os.makedirs(model_dir,exist_ok=True)
           joblib.dump(random_search.best_estimator_,f'{self.base_path}/Model_Dump_JOBLIB/{model_name}.joblib')
 
+
+          artifact_path= os.path.join(model_dir,f'{model_name}.joblib')
           mlflow.log_params(random_search.best_params_)
           mlflow.log_metric('best_score',random_search.best_score_)
-          mlflow.log_artifact(f"{self.base_path}/Model_Dump_JOBLIB/{model_name}.joblib")
+          mlflow.log_artifact(artifact_path,artifact_path=os.path.basename(artifact_path))
           print(f'model:{random_search.best_estimator_}')
           print(f'best_score: {random_search.best_score_}')
           print(f'best_params: {random_search.best_params_}')
@@ -287,7 +292,7 @@ class BuildingModels:
           mlflow.log_metric('recall',recall)
           mlflow.log_metric('f1_score',f1score)
           mlflow.log_text(class_report,f'{mdl_name}_classification_report.txt')
-          mlflow.log_artifact(plot_path)
+          mlflow.log_artifact(plot_path,artifact_path=os.path.basename(plot_path))
 
 
           df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
@@ -347,8 +352,11 @@ class BuildingModels:
 
         mlflow.log_metric('best_f1_score',self.best_f1_score)
         mlflow.log_metric('best_threshold',self.best_model_threshold)
-
-
+        mlflow.sklearn.log_model(best_model,"BestModel")
+        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib',
+        artifact_path = os.path.basename(f"BestModel_{self.best_model_name}.joblib"))
+        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt',
+        artifact_path = os.path.basename('best_threshold.txt'))
 
 
 
