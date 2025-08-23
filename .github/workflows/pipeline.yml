@@ -137,7 +137,7 @@ jobs:
         run: |
           mkdir -p Master/mlruns && chmod -R 777 Master/mlruns
           mkdir -p Master/Model_Dump_JOBLIB && chmod -R 777 Master/Model_Dump_JOBLIB
-          
+
       - name: Run Model Building
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -174,7 +174,7 @@ jobs:
           git commit -m "Adding genearated model files and confusion matrix plots" || echo "No changes to commit"
 
           git pull origin main --rebase || {
-             echo "Merge Conflict detectd. Aborting rebase and skipping
+             echo "Merge Conflict detectd. Aborting rebase and skipping"
              git rebase --abort
              exit 0
              }
