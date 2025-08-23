@@ -137,7 +137,7 @@ jobs:
       - name: Run Model Building
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          MLFLOW_TRACKING_URI: file:///github/workspace/Master/mlruns
+          MLFLOW_TRACKING_URI: file://${{ github.workspace }}/Master/mlruns
         run: |
           cd Master
           python main.py --job modelbuilding
@@ -170,7 +170,7 @@ jobs:
           git commit -m "Adding genearated model files and confusion matrix plots" || echo "No changes to commit"
 
           git pull origin main --rebase || {
-             echo "Merge Conflict detectd. Aborting rebase and skipping 
+             echo "Merge Conflict detectd. Aborting rebase and skipping
              git rebase --abort
              exit 0
              }
@@ -185,7 +185,7 @@ jobs:
           echo "Rebase failed. cleaning up"
           git rebase --abort || true
           exit 0
-          
+
 
   deploy-to-spaces:
     runs-on: ubuntu-latest
