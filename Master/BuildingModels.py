@@ -219,11 +219,9 @@ class BuildingModels:
           os.makedirs(model_dir,exist_ok=True)
           joblib.dump(random_search.best_estimator_,f'{self.base_path}/Model_Dump_JOBLIB/{model_name}.joblib')
 
-
-          artifact_path= os.path.join(model_dir,f'{model_name}.joblib')
           mlflow.log_params(random_search.best_params_)
           mlflow.log_metric('best_score',random_search.best_score_)
-          mlflow.log_artifact(artifact_path)
+          mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/{model_name}.joblib')
           print(f'model:{random_search.best_estimator_}')
           print(f'best_score: {random_search.best_score_}')
           print(f'best_params: {random_search.best_params_}')

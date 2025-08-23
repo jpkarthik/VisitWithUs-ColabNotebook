@@ -133,7 +133,11 @@ jobs:
         run: |
           mkdir -p Master/Model_Dump_JOBLIB
           mkdir -p Master/mlruns
-
+      - name: Set Permission for MLFlow and Model Directories
+        run: |
+          mkdir -p Master/mlruns && chmod -R 777 Master/mlruns
+          mkdir -p Master/Model_Dump_JOBLIB && chmod -R 777 Master/Model_Dump_JOBLIB
+          
       - name: Run Model Building
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
