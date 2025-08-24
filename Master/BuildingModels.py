@@ -360,13 +360,15 @@ class BuildingModels:
           if Build_Model:
             df_Metrics = self.Model_Evaluation()
             print(df_Metrics)
-            if not df_Metrics.empty and df_Metrics is not None:
-              if self.Register_BestModel_HF():
-                return True
-              else:
-                return False
-            else:
-              return False
+            self.Register_BestModel_HF():
+            return True
+            # if not df_Metrics.empty and df_Metrics is not None:
+            #   if self.Register_BestModel_HF():
+            #     return True
+            #   else:
+            #     return False
+            # else:
+            #   return False
           else:
             return False
     except Exception as ex:
