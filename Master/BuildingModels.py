@@ -192,7 +192,7 @@ class BuildingModels:
 
           mlflow.log_params(random_search.best_params_)
           mlflow.log_metric('best_score',random_search.best_score_)
-          #mlflow.log_artifact(abs_path,artifact_path='models')
+          mlflow.log_artifact(abs_path,artifact_path='models')
           print(f'model:{random_search.best_estimator_}')
           print(f'best_score: {random_search.best_score_}')
           print(f'best_params: {random_search.best_params_}')
@@ -263,7 +263,7 @@ class BuildingModels:
           mlflow.log_metric('recall',recall)
           mlflow.log_metric('f1_score',f1score)
           mlflow.log_text(class_report,f'{mdl_name}_classification_report.txt')
-          #mlflow.log_artifact(plot_path,artifact_path='models')
+          mlflow.log_artifact(plot_path,artifact_path='models')
 
 
           df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
@@ -321,17 +321,17 @@ class BuildingModels:
                       repo_id=self.repo_id, repo_type=self.repo_type
                       )
       with mlflow.start_run(run_name=f"Best_{self.best_model_name}"):
-        #input_epl = self.feature_train.head(5)
+        input_epl = self.feature_train.head(5)
 
 
 
         mlflow.log_metric('best_f1_score',self.best_f1_score)
         mlflow.log_metric('best_threshold',self.best_model_threshold)
-        # mlflow.sklearn.log_model(sk_model=best_model,
-        #                          artifact_path="BestModel",
-        #                          input_example=input_epl)
-        # mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib', artifact_path='models')
-        # mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt',artifact_path='models')
+        mlflow.sklearn.log_model(sk_model=best_model,
+                                 artifact_path="BestModel",
+                                 input_example=input_epl)
+        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib', artifact_path='models')
+        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt',artifact_path='models')
 
 
 
@@ -360,15 +360,15 @@ class BuildingModels:
           if Build_Model:
             df_Metrics = self.Model_Evaluation()
             print(df_Metrics)
-            self.Register_BestModel_HF()
-            return True
-            # if not df_Metrics.empty and df_Metrics is not None:
-            #   if self.Register_BestModel_HF():
-            #     return True
-            #   else:
-            #     return False
-            # else:
-            #   return False
+            # self.Register_BestModel_HF()
+            # return True
+            if not df_Metrics.empty and df_Metrics is not None:
+              if self.Register_BestModel_HF():
+                return True
+              else:
+                return False
+            else:
+              return False
           else:
             return False
     except Exception as ex:
