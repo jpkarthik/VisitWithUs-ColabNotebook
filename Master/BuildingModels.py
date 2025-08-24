@@ -269,6 +269,7 @@ class BuildingModels:
           df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
                                               'precision':[precision], 'recall':[recall],
                                               'f1_score':[f1score]})],ignore_index=True)
+          print(df_metrics)
 
           if f1score > self.best_f1_score:
             self.best_f1_score = f1score
@@ -320,15 +321,15 @@ class BuildingModels:
                       repo_id=self.repo_id, repo_type=self.repo_type
                       )
       with mlflow.start_run(run_name=f"Best_{self.best_model_name}"):
-        input_epl = self.feature_train.head(5)
+        #input_epl = self.feature_train.head(5)
 
 
 
         mlflow.log_metric('best_f1_score',self.best_f1_score)
         mlflow.log_metric('best_threshold',self.best_model_threshold)
-        mlflow.sklearn.log_model(sk_model=best_model,
-                                 artifact_path="BestModel",
-                                 input_example=input_epl)
+        # mlflow.sklearn.log_model(sk_model=best_model,
+        #                          artifact_path="BestModel",
+        #                          input_example=input_epl)
         # mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib', artifact_path='models')
         # mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt',artifact_path='models')
 
@@ -346,6 +347,7 @@ class BuildingModels:
 
   def ToRunPipeline(self):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
+    df_Metrics = pd.DataFrame()
     try:
       if not self.Load_data_from_HF():
         return False
