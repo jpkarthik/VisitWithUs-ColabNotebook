@@ -137,6 +137,11 @@ jobs:
         run: |
           mkdir -p Master/mlruns && chmod -R 777 Master/mlruns
           mkdir -p Master/Model_Dump_JOBLIB && chmod -R 777 Master/Model_Dump_JOBLIB
+      - name: Debug Directory Contents
+        run: |
+          ls -la Master/
+          ls -la Master/Model_Dump_JOBLIB/ || echo "Model_Dump_JOBLIB is empty"
+          ls -la Master/mlruns/ || echo "mlruns is empty"
 
       - name: Run Model Building
         env:

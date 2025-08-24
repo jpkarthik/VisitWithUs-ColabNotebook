@@ -31,6 +31,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 class BuildingModels:
   def __init__(self,base_path, hf_token=None):
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
+    print(f"Base Path: {base_path}")
     self.models = {}
     self.best_model = None
     self.best_score = 0
@@ -209,6 +210,8 @@ class BuildingModels:
     print(f"Function Name {inspect.currentframe().f_code.co_name}")
     df_metrics = pd.DataFrame()
     try:
+      model_dir = os.path.join(self.base_path,'Model_Dump_JOBLIB')
+      os.makedirs(model_dir,exist_ok=True)
       for mdl_name, mdl_info in self.models.items():
         with mlflow.start_run(run_name=f"{mdl_name}_eval"):
           model = mdl_info['model']
@@ -355,7 +358,7 @@ class BuildingModels:
           if Build_Model:
             df_Metrics = self.Model_Evaluation()
             print(df_Metrics)
-            if not df_Metrics.empty:
+            if not df_Metrics.empty and df_Metrics is not None:
               if self.Register_BestModel_HF():
                 return True
               else:
