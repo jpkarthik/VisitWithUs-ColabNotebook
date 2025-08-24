@@ -260,7 +260,7 @@ class BuildingModels:
           mlflow.log_metric('recall',recall)
           mlflow.log_metric('f1_score',f1score)
           mlflow.log_text(class_report,f'{mdl_name}_classification_report.txt')
-          mlflow.log_artifact(plot_path,artifact_path='models')
+          #mlflow.log_artifact(plot_path,artifact_path='models')
 
 
           df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
@@ -326,8 +326,8 @@ class BuildingModels:
         mlflow.sklearn.log_model(sk_model=best_model,
                                  artifact_path="BestModel",
                                  input_example=input_epl)
-        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib', artifact_path='models')
-        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt',artifact_path='models')
+        # mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib', artifact_path='models')
+        # mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt',artifact_path='models')
 
 
 
