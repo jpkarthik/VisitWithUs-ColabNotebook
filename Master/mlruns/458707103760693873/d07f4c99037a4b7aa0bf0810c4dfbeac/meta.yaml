@@ -1,0 +1,14 @@
+artifact_uri: file:///content/drive/MyDrive/PGP_AI_ML_GREAT_LEARNING/10_Advance_Machine_Learning_And_MLOps/Final_Project/VisitWithUs-Tourism_version_1_1/Master/mlruns/458707103760693873/d07f4c99037a4b7aa0bf0810c4dfbeac/artifacts
+end_time: 1756008042902
+entry_point_name: ''
+experiment_id: '458707103760693873'
+lifecycle_stage: active
+run_id: d07f4c99037a4b7aa0bf0810c4dfbeac
+run_name: DecisionTreeClassifier_eval
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1756008042166
+status: 3
+tags: []
+user_id: root

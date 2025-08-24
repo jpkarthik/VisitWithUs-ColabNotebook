@@ -1,0 +1,10 @@
+artifact_location: file:///content/drive/MyDrive/PGP_AI_ML_GREAT_LEARNING/10_Advance_Machine_Learning_And_MLOps/Final_Project/VisitWithUs-Tourism_version_1_1/Master/mlruns/458707103760693873/models/m-d974d03d8f894a8394e66370c1c15b28/artifacts
+creation_timestamp: 1756008047618
+experiment_id: '458707103760693873'
+last_updated_timestamp: 1756008053422
+model_id: m-d974d03d8f894a8394e66370c1c15b28
+model_type: null
+name: BestModel
+source_run_id: a96cf75770f94f38b00390b716f985af
+status: 2
+status_message: null

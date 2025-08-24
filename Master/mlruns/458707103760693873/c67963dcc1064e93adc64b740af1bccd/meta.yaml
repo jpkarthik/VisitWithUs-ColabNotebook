@@ -1,0 +1,14 @@
+artifact_uri: file:///content/drive/MyDrive/PGP_AI_ML_GREAT_LEARNING/10_Advance_Machine_Learning_And_MLOps/Final_Project/VisitWithUs-Tourism_version_1_1/Master/mlruns/458707103760693873/c67963dcc1064e93adc64b740af1bccd/artifacts
+end_time: 1756006224008
+entry_point_name: ''
+experiment_id: '458707103760693873'
+lifecycle_stage: active
+run_id: c67963dcc1064e93adc64b740af1bccd
+run_name: RandomForestClassifier_eval
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1756006223356
+status: 3
+tags: []
+user_id: root

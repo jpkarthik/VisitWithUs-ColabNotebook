@@ -4,7 +4,7 @@ FROM python:3.12-slim
 # Set the working directory inside the container to /app
 WORKDIR /app
 
-# Copy all files from the current directory on the host to the container's /app directory
+# Copy all files from the current directory on the host to the container's /app # directory
 COPY . .
 
 # Install Python dependencies listed in requirements.txt

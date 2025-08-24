@@ -2,13 +2,13 @@ import streamlit as st
 import pandas as pd
 import joblib
 import os
-import dill
 import logging
 from huggingface_hub import login,hf_hub_download
-from xgboost import XGBClassifier
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+os.environ["STREAMLIT_CONFIG_DIR"] = "/tmp/.streamlit"
 cache_dir = "/tmp/hf_cache"
 os.environ["HF_HOME"] = cache_dir
 os.environ["HUGGINGFACE_HUB_CACHE"] = cache_dir
@@ -55,7 +55,7 @@ class PredictorTourism:
     try:
       logger.info("Loading best model")
       model_path = hf_hub_download(
-          repo_id = self.repoID,filename = f'Model_Dump_JOBLIB/BestModel_XGBoostingClassifier.joblib',
+          repo_id = self.repoID,filename = f'Model_Dump_JOBLIB/BestModel_GradientBoostingClassifier.joblib',
           repo_type = 'model')
       threshold_path = hf_hub_download(
           repo_id = self.repoID, filename=f'Model_Dump_JOBLIB/best_threshold.txt',
@@ -64,9 +64,9 @@ class PredictorTourism:
       logger.info(f"Model path: {model_path}")
       logger.info(f"Threshold path:  {threshold_path}")
 
-      #self.model = joblib.load(model_path)
-      with open(model_path, 'rb') as f:
-        self.model = joblib.load(f)
+      self.model = joblib.load(model_path)
+      # with open(model_path, 'rb') as f:
+      #   self.model = joblib.load(f)
       with open(threshold_path,'r') as f:
         self.best_threshold = float(f.read())
       st.success("Model and threshold loaded successfully")

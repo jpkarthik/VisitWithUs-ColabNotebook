@@ -1,0 +1,46 @@
+artifact_path: file:///content/drive/MyDrive/PGP_AI_ML_GREAT_LEARNING/10_Advance_Machine_Learning_And_MLOps/Final_Project/VisitWithUs-Tourism_version_1_1/Master/mlruns/458707103760693873/models/m-42245a67369245a5b601cc4991ea0b70/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.11
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.7.1
+is_signature_from_type_hint: false
+mlflow_version: 3.3.1
+model_id: m-42245a67369245a5b601cc4991ea0b70
+model_size_bytes: 484454
+model_uuid: m-42245a67369245a5b601cc4991ea0b70
+prompts: null
+run_id: 28621573703148b6aeda41ab62993bb7
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "Age", "required": true}, {"type": "string",
+    "name": "TypeofContact", "required": true}, {"type": "long", "name": "CityTier",
+    "required": true}, {"type": "double", "name": "DurationOfPitch", "required": true},
+    {"type": "string", "name": "Occupation", "required": true}, {"type": "string",
+    "name": "Gender", "required": true}, {"type": "long", "name": "NumberOfPersonVisiting",
+    "required": true}, {"type": "double", "name": "NumberOfFollowups", "required":
+    true}, {"type": "string", "name": "ProductPitched", "required": true}, {"type":
+    "double", "name": "PreferredPropertyStar", "required": true}, {"type": "string",
+    "name": "MaritalStatus", "required": true}, {"type": "double", "name": "NumberOfTrips",
+    "required": true}, {"type": "long", "name": "Passport", "required": true}, {"type":
+    "long", "name": "PitchSatisfactionScore", "required": true}, {"type": "long",
+    "name": "OwnCar", "required": true}, {"type": "double", "name": "NumberOfChildrenVisiting",
+    "required": true}, {"type": "string", "name": "Designation", "required": true},
+    {"type": "double", "name": "MonthlyIncome", "required": true}]'
+  outputs: '[{"type": "long", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-08-23 15:38:18.947198'

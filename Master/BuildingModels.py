@@ -54,7 +54,8 @@ class BuildingModels:
     os.makedirs(mlruns_path, exist_ok=True)
     mlflow.set_tracking_uri(f"file://{mlruns_path}")
     print(f"Tracking URI file://{mlruns_path}")
-    mlflow.set_experiment("Tourism-Prediction-Experiment")
+    experiment = mlflow.set_experiment("Tourism-Prediction-Experiment")
+    print(f"Experiment ID {experiment}")
     self.categorical_columns = ['TypeofContact','Occupation','Gender','ProductPitched','MaritalStatus','Designation']
     self.numerical_columns = ['Age','CityTier','DurationOfPitch','NumberOfPersonVisiting',
                               'NumberOfFollowups','PreferredPropertyStar',
@@ -144,28 +145,6 @@ class BuildingModels:
                          }
           },
 
-          'BaggingClassifier':{
-              'model': BaggingClassifier(estimator=DecisionTreeClassifier(class_weight='balanced',random_state=42)),
-              'params':{  'classifier__n_estimators':[10,50,75,100],
-                          'classifier__max_samples':[0.3,0.5,0.7,0.9],
-                          'classifier__max_features':[0.3,0.5,0.7],
-                          'classifier__oob_score':[True],
-                          'classifier__estimator__criterion':['gini','entropy'],
-                          'classifier__estimator__max_depth':[5,7,9],
-                          'classifier__estimator__min_samples_split':[8,10,12],
-                          'classifier__estimator__min_samples_leaf':[2,3,5]
-                        }
-          },
-
-          'AdaBoostingClassifier':{
-              'model': AdaBoostClassifier(random_state=42),
-              'params':{  'classifier__n_estimators':[50,75,100],
-                          'classifier__learning_rate':[0.01,0.05,0.1],
-                          'classifier__algorithm':['SAMME','SAMME.R']
-
-                      }
-          },
-
           'GradientBoostingClassifier':{
               'model': GradientBoostingClassifier(random_state=42),
               'params':{
@@ -176,19 +155,6 @@ class BuildingModels:
                           'classifier__min_samples_leaf':[1,2,4],
                           'classifier__subsample':[0.6,0.7,0.8],
                           'classifier__max_depth':[2,3,4,5]
-                        }
-          },
-
-          'XGBoostingClassifier':{
-              'model':XGBClassifier(use_label_encoder=False, eval_metric='logloss'),
-              'params':{'classifier__n_estimators':np.arange(50,100,10),
-                        'classifier__max_depth': [3,5,7],
-                        'classifier__learning_rate':[0.01,0.1,0.2],
-                        'classifier__subsample':[0.6,0.8,1.0],
-                        'classifier__colsample_bytree':[0.6,0.8,1.0],
-                        'classifier__gamma':[0,1,2],
-                        'classifier__reg_alpha':[0,1,2]
-
                         }
           }
 
@@ -214,7 +180,7 @@ class BuildingModels:
               'best_score': random_search.best_score_,
               'best_params':random_search.best_params_
             }
-          
+
           model_dir = os.path.join(self.base_path,'Model_Dump_JOBLIB')
           os.makedirs(model_dir,exist_ok=True)
           joblib.dump(random_search.best_estimator_,f'{self.base_path}/Model_Dump_JOBLIB/{model_name}.joblib')
@@ -225,7 +191,7 @@ class BuildingModels:
 
           mlflow.log_params(random_search.best_params_)
           mlflow.log_metric('best_score',random_search.best_score_)
-          #mlflow.log_artifact(abs_path,rel_path)
+          mlflow.log_artifact(abs_path,artifact_path='models')
           print(f'model:{random_search.best_estimator_}')
           print(f'best_score: {random_search.best_score_}')
           print(f'best_params: {random_search.best_params_}')
@@ -294,7 +260,7 @@ class BuildingModels:
           mlflow.log_metric('recall',recall)
           mlflow.log_metric('f1_score',f1score)
           mlflow.log_text(class_report,f'{mdl_name}_classification_report.txt')
-          mlflow.log_artifact(plot_path)
+          mlflow.log_artifact(plot_path,artifact_path='models')
 
 
           df_metrics = pd.concat([df_metrics,pd.DataFrame({'model':[mdl_name],'accuracy':[accuracy],
@@ -351,12 +317,17 @@ class BuildingModels:
                       repo_id=self.repo_id, repo_type=self.repo_type
                       )
       with mlflow.start_run(run_name=f"Best_{self.best_model_name}"):
+        input_epl = self.feature_train.head(5)
+
+
 
         mlflow.log_metric('best_f1_score',self.best_f1_score)
         mlflow.log_metric('best_threshold',self.best_model_threshold)
-        mlflow.sklearn.log_model(best_model,"BestModel")
-        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib')
-        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt')
+        mlflow.sklearn.log_model(sk_model=best_model,
+                                 artifact_path="BestModel",
+                                 input_example=input_epl)
+        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/BestModel_{self.best_model_name}.joblib', artifact_path='models')
+        mlflow.log_artifact(f'{self.base_path}/Model_Dump_JOBLIB/best_threshold.txt',artifact_path='models')
 
 
 
@@ -395,5 +366,6 @@ class BuildingModels:
             return False
     except Exception as ex:
       print(f'Exception occured {ex}')
+      print(traceback.print_exc())
     finally:
       print('-'*50)

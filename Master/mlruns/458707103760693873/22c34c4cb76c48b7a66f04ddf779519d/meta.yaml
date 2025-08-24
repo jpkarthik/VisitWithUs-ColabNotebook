@@ -1,0 +1,14 @@
+artifact_uri: file:///content/drive/MyDrive/PGP_AI_ML_GREAT_LEARNING/10_Advance_Machine_Learning_And_MLOps/Final_Project/VisitWithUs-Tourism_version_1_1/Master/mlruns/458707103760693873/22c34c4cb76c48b7a66f04ddf779519d/artifacts
+end_time: 1756006234470
+entry_point_name: ''
+experiment_id: '458707103760693873'
+lifecycle_stage: active
+run_id: 22c34c4cb76c48b7a66f04ddf779519d
+run_name: Best_GradientBoostingClassifier
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1756006227199
+status: 3
+tags: []
+user_id: root

@@ -42,6 +42,8 @@ class HostingInHuggingFace:
       api.upload_folder(repo_id=self.repo_id, folder_path=directory_to_upload,
                         repo_type='space')
       print(f"Successfully upload {directory_to_upload} into {self.repo_id}")
+
+     
       return True
     except Exception as ex:
       print(f"Exception occured {ex}")
